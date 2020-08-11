@@ -6,9 +6,14 @@
          <link rel="stylesheet" href="/static/stylesheets/welcome-template.css">
 
          <!-- uses welcome struct and the . operator to retrieve the name value -->
-         <title>Welcome {{.Name}}</title>
+         <title>Welcome {{.Name}}.</title>
    </head>
    <body>
-      <div class="welcome center">Welcome {{.Name}}, it is {{.Time}}</div>
+      <div class="welcome center">
+         <div>
+            Welcome {{.Name}}, it is {{.Time}} <br>
+            There are {{.VillagerCount}} villagers.
+         </div>
+      </div>
    </body>
 </html>

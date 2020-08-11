@@ -1,21 +1,60 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"           // for formatting our text
 	"html/template" // a library that allows us to interact with our html file
-	"net/http"      // to access the core go http functionality
-	"time"          // a library for working with date and time
+	"io/ioutil"
+	"net/http" // to access the core go http functionality
+	"os"
+	"time" // a library for working with date and time
 )
 
-// holds information to be displayed in our HTML file
+// Welcome holds information to be displayed in our HTML file
 type Welcome struct {
-	Name string
-	Time string
+	Name          string
+	Time          string
+	Villagers     []Villager
+	VillagerCount int
+}
+
+// Villager holds information from the Animal Crossing API
+type Villager struct {
+	Name        Name
+	Personality string `json:"personality"`
+	Birthday    string `json:"birthday-string"`
+	Species     string `json:"species"`
+	Gender      string `json:"gender"`
+	CatchPhrase string `json:"catch-phrase"`
+}
+
+// Name holds the Villager's inner name
+type Name struct {
+	Name string `json:"name-USen"`
 }
 
 // entrypoint
 func main() {
-	welcome := Welcome{"Anonymous", time.Now().Format(time.Stamp)}
+	// gets a response and error (if present) from the animal crossing API
+	response, err := http.Get("https://acnhapi.com/v1a/villagers")
+
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+
+	// read the response body
+	responseData, err := ioutil.ReadAll(response.Body)
+
+	// unmarshal into villager struct
+	var villagers []Villager
+	json.Unmarshal(responseData, &villagers)
+
+	welcome := Welcome{Name: "Anonymous", Time: time.Now().Format(time.Stamp), Villagers: villagers, VillagerCount: len(villagers)}
+
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	// relative path
 	// template.Must() handles any errors and halts if there are fatal errors
