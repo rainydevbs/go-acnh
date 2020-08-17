@@ -33,9 +33,7 @@ type Name struct {
 	Name string `json:"name-USen"`
 }
 
-// entrypoint
-func main() {
-	// gets a response and error (if present) from the animal crossing API
+func getVillagers() (villagers []Villager) {
 	response, err := http.Get("https://acnhapi.com/v1a/villagers")
 
 	if err != nil {
@@ -43,18 +41,23 @@ func main() {
 		os.Exit(1)
 	}
 
-	// read the response body
 	responseData, err := ioutil.ReadAll(response.Body)
 
-	// unmarshal into villager struct
-	var villagers []Villager
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+
 	json.Unmarshal(responseData, &villagers)
 
-	welcome := Welcome{Name: "Anonymous", Time: time.Now().Format(time.Stamp), Villagers: villagers, VillagerCount: len(villagers)}
+	return
+}
 
-	if err != nil {
-		fmt.Println(err)
-	}
+// entrypoint
+func main() {
+	villagers := getVillagers()
+
+	welcome := Welcome{Name: "Anonymous", Time: time.Now().Format(time.Stamp), Villagers: villagers, VillagerCount: len(villagers)}
 
 	// relative path
 	// template.Must() handles any errors and halts if there are fatal errors
