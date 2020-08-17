@@ -41,6 +41,8 @@ func getVillagers() (villagers []Villager) {
 		os.Exit(1)
 	}
 
+	// closes Body after ReadAll executes
+	defer response.Body.Close()
 	responseData, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
